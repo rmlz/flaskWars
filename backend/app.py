@@ -3,7 +3,8 @@
 #----------------------------------------------------------------------------#
 
 from flask import Flask, render_template, request
-# from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
+from functools import wraps
 import logging
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from logging import Formatter, FileHandler
@@ -15,8 +16,9 @@ import os
 #----------------------------------------------------------------------------#
 
 app = Flask(__name__)
+app.debug = True
 app.config.from_object('config')
-#db = SQLAlchemy(app)
+db = SQLAlchemy(app)
 
 # Automatically tear down SQLAlchemy.
 '''
@@ -26,7 +28,7 @@ def shutdown_session(exception=None):
 '''
 
 # Login required decorator.
-'''
+
 def login_required(test):
     @wraps(test)
     def wrap(*args, **kwargs):
@@ -36,7 +38,7 @@ def login_required(test):
             flash('You need to login first.')
             return redirect(url_for('login'))
     return wrap
-'''
+
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
@@ -46,22 +48,26 @@ def login_required(test):
 def home():
     return render_template('pages/placeholder.home.html')
 
-
+@login_required
 @app.route('/about')
 def about():
     return render_template('pages/placeholder.about.html')
 
 
-@app.route('/login')
+@app.route('/login', methods=["GET", "POST"])
 def login():
     form = LoginForm(request.form)
     return render_template('forms/login.html', form=form)
 
 
-@app.route('/register')
+@app.route('/register', methods=["GET", "POST"])
 def register():
     form = RegisterForm(request.form)
+    if request.method == 'POST':
+        print(request.values.get('name'))
     return render_template('forms/register.html', form=form)
+    
+        
 
 
 @app.route('/forgot')

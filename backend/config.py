@@ -12,3 +12,6 @@ SECRET_KEY = 'my precious'
 
 # Connect to the database
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'database.db')
+
+# Auto Reload
+TEMPLATES_AUTO_RELOAD = True
